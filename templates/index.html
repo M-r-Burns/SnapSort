@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapSort</title>
+    <link rel="icon" href="{{ url_for('static', filename='icon.png') }}">
+    <style>
+        :root {
+            --bg-app: #1e1e1e;
+            --bg-panel: rgba(30, 30, 30, 0.6);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --accent-blue: #0A84FF;
+            --accent-red: #FF453A;
+            --accent-green: #30D158;
+            --accent-yellow: #FFD60A;
+            --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            background-image: linear-gradient(to bottom, #1a1a1a, #000);
+            color: var(--text-primary);
+            font-family: var(--font-stack);
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        #header {
+            height: 52px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-light);
+            background: rgba(38, 38, 38, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: -0.01em;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .logo-area img {
+            width: 24px;
+            height: 24px;
+            box-shadow: none;
+            border-radius: 5px;
+        }
+
+        select {
+            appearance: none;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid var(--border-light);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+        select:hover { background-color: rgba(255,255,255,0.15); }
+
+        /* VIEWER */
+        #viewer-container {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            overflow: hidden;
+        }
+
+        img, video {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+
+        /* OVERLAYS */
+        #date-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+            pointer-events: none;
+            z-index: 10;
+            border: 1px solid var(--border-light);
+        }
+
+        #status-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 40px 60px;
+            border-radius: 20px;
+            font-size: 28px;
+            font-weight: 600;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            border: 1px solid var(--border-light);
+        }
+
+        #loading-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        /* METADATA */
+        #metadata {
+            background: rgba(35, 35, 35, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 0 20px;
+            height: 32px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-light);
+            flex-shrink: 0;
+            z-index: 90;
+        }
+        .meta-item { display: flex; gap: 8px; align-items: center; }
+        .meta-label { font-size: 10px; font-weight: 600; color: #777; letter-spacing: 0.02em; text-transform: uppercase; }
+        .meta-value { color: #ddd; font-variant-numeric: tabular-nums; }
+
+        /* CONTROLS */
+        #controls {
+            background: rgba(30, 30, 30, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 15px 25px 30px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-top: 1px solid var(--border-light);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        #slider-container { display: flex; align-items: center; gap: 15px; width: 100%; margin-bottom: 5px; }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type="range"]:focus { outline: none; }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            -webkit-appearance: none;
+            margin-top: -7px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+        #button-row { display: flex; justify-content: center; gap: 16px; }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 0 20px;
+            height: 52px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:active { transform: scale(0.96); opacity: 0.9; }
+        
+        button span {
+            font-size: 10px;
+            opacity: 0.6;
+            font-weight: 500;
+            margin-top: 3px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .btn-back { background: rgba(255, 255, 255, 0.1); color: #ddd; }
+        .btn-back:hover { background: rgba(255, 255, 255, 0.15); }
+        
+        /* Mac System Colors */
+        .btn-del { background: var(--accent-red); color: white; }
+        .btn-del:hover { background: #ff5b52; box-shadow: 0 0 20px rgba(231, 76, 60, 0.4); }
+        
+        .btn-fav { background: var(--accent-yellow); color: #222; }
+        .btn-fav:hover { background: #ffe04d; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4); }
+        .btn-fav span { color: rgba(0,0,0,0.6); }
+
+        .btn-keep { background: var(--accent-green); color: white; }
+        .btn-keep:hover { background: #4ce073; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); }
+
+        /* SETUP MODAL */
+        #setup-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 999;
+        }
+        #setup-box {
+            background: rgba(30, 30, 30, 0.8);
+            padding: 50px;
+            border-radius: 18px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            width: 420px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        }
+        #setup-box h2 { font-weight: 600; letter-spacing: -0.5px; margin-bottom: 10px; }
+        
+        /* HEADER MIDDLE - FOLDER PATH */
+        #folder-info {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.2); padding: 4px 6px 4px 12px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        #folder-path {
+            font-size: 11px; color: var(--text-secondary); max-width: 250px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            text-align: center;
+        }
+        .btn-tiny {
+            background: rgba(255,255,255,0.1); border: none; color: #ccc;
+            padding: 0 10px; border-radius: 5px; font-size: 11px; font-weight: 500;
+            cursor: pointer; height: 24px; min-width: auto; width: auto;
+            box-shadow: none; display: flex; align-items: center;
+        }
+        .btn-tiny:hover { background: rgba(255,255,255,0.2); color: white; }
+        .btn-tiny:active { transform: scale(0.96); }
+
+        /* REVEAL BUTTON */
+        .reveal-btn {
+            background: rgba(10, 132, 255, 0.15); border: 1px solid rgba(10, 132, 255, 0.3); 
+            color: var(--accent-blue); cursor: pointer; 
+            padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;
+            margin-left: 8px; min-width: auto; height: 18px; 
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .reveal-btn:hover { background: rgba(10, 132, 255, 0.25); }
+    </style>
+</head>
+<body>
+
+<div id="setup-modal">
+    <div id="setup-box">
+        <h2 style="margin-top:0; color:white;">Select Folder</h2>
+        <p style="color:var(--text-secondary); margin-bottom: 30px;">Click below to choose the folder you want to sort.</p>
+        
+        <button class="btn-keep" onclick="openNativePicker()" style="width:100%; font-size:16px;">📂 Choose Folder...</button>
+        
+        <p id="picker-status" style="color:var(--accent-red); font-size:12px; margin-top:10px; height:15px;"></p>
+    </div>
+</div>
+
+<div id="header">
+    <div class="logo-area">
+        <img src="{{ url_for('static', filename='icon.png') }}" alt="Icon">
+        <span>SnapSort</span>
+    </div>
+    
+    <div id="folder-info">
+        <span id="folder-path" title="No folder selected">No Folder Selected</span>
+        <button class="btn-tiny" onclick="openNativePicker()">Change Folder</button>
+    </div>
+
+    <div class="control-group">
+        <select id="sortSelect" onchange="loadFiles()">
+            <option value="date_asc">Oldest First</option>
+            <option value="date_desc">Newest First</option>
+            <option value="name">File Name</option>
+        </select>
+    </div>
+</div>
+
+<div id="viewer-container">
+    <div id="status-msg">Action</div>
+    <div id="content" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
+    <div id="date-overlay">--</div>
+    <div id="loading-indicator">Caching next HEIC files...</div>
+</div>
+
+<div id="metadata">
+    <div class="meta-item">
+        <span class="meta-label">Filename</span>
+        <span class="meta-value" id="meta-name">--</span>
+        <button class="reveal-btn" onclick="revealCurrentFile()" title="Show in Finder">Show in Finder</button>
+    </div>
+    <div class="meta-item">
+        <span class="meta-label">Date</span>
+        <span class="meta-value" id="meta-date">--</span>
+    </div>
+    <div class="meta-item">
+        <span class="meta-label">Size</span>
+        <span class="meta-value" id="meta-size">--</span>
+    </div>
+</div>
+
+<div id="controls">
+    <div id="slider-container">
+        <span id="counter" style="font-size:13px; font-variant-numeric: tabular-nums; width: 80px; text-align:right; color: var(--text-secondary);">0/0</span>
+        <input type="range" id="fileSlider" min="0" max="100" value="0" oninput="handleSliderInput()" onchange="handleSliderChange()">
+    </div>
+
+    <div id="button-row">
+        <button class="btn-back" onclick="prevFile()">Back <span>(← Left)</span></button>
+        <button class="btn-del" onclick="deleteFile()">Delete <span>(Backspace)</span></button>
+        <button class="btn-fav" onclick="favFile()">Favorite <span>(↑ Up)</span></button>
+        <button class="btn-keep" onclick="nextFile()">Keep <span>(→ Right)</span></button>
+    </div>
+</div>
+
+<script>
+    let files = [];
+    let currentIndex = 0;
+    const imageCache = new Map();
+
+    setInterval(() => {
+        fetch('/heartbeat', { method: 'POST' }).catch(e => console.log("Server unreachable"));
+    }, 1000);
+
+    // --- NEW NATIVE PICKER LOGIC ---
+    async function openNativePicker() {
+        const statusEl = document.getElementById('picker-status');
+        statusEl.innerText = "Waiting for selection...";
+        
+        try {
+            const res = await fetch('/select_folder_native', { method: 'POST' });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                statusEl.innerText = "Folder Selected!";
+                document.getElementById('setup-modal').style.display = 'none';
+                if(data.path) {
+                    document.getElementById('folder-path').innerText = data.path;
+                    document.getElementById('folder-path').title = data.path;
+                }
+                loadFiles();
+            } else if (data.status === 'cancel') {
+                statusEl.innerText = "Selection canceled.";
+            } else {
+                statusEl.innerText = "Error: " + data.message;
+            }
+        } catch (e) {
+            statusEl.innerText = "Connection error.";
+        }
+    }
+
+    async function revealCurrentFile() {
+        if(files.length === 0) return;
+        const file = files[currentIndex];
+        // Optimistic UI feedback
+        const btn = document.querySelector('.reveal-btn');
+        const oldText = btn.innerText;
+        btn.innerText = "Opening...";
+        
+        try {
+            await fetch('/reveal', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({filename: file.name})
+            });
+        } catch(e) {
+            console.error("Failed to reveal");
+        }
+        setTimeout(() => btn.innerText = oldText, 1000);
+    }
+
+    async function loadFiles() {
+        const sortMode = document.getElementById('sortSelect').value;
+        const res = await fetch(`/files?sort=${sortMode}`);
+        files = await res.json();
+        if(files.length > 0) {
+            document.getElementById('fileSlider').max = files.length - 1;
+            currentIndex = 0;
+            updateUI();
+        } else {
+            document.getElementById('content').innerHTML = "<h3 style='color:#777'>No media found.</h3>";
+        }
+    }
+
+    function updateUI() {
+        if(files.length === 0) return;
+        if(currentIndex >= files.length) currentIndex = files.length - 1;
+        if(currentIndex < 0) currentIndex = 0;
+
+        const file = files[currentIndex];
+        const contentDiv = document.getElementById('content');
+        const encodedName = encodeURIComponent(file.name);
+        
+        if (file.type === 'video') {
+            contentDiv.innerHTML = `<video src="/file/${encodedName}" controls autoplay loop></video>`;
+        } else {
+            contentDiv.innerHTML = `<img src="/file/${encodedName}">`;
+        }
+
+        document.getElementById('date-overlay').innerText = file.date_str;
+        document.getElementById('meta-name').innerText = file.name;
+        document.getElementById('meta-date').innerText = file.date_str;
+        document.getElementById('meta-size').innerText = file.size;
+        
+        document.getElementById('fileSlider').value = currentIndex;
+        document.getElementById('counter').innerText = `${currentIndex + 1}/${files.length}`;
+        
+        preloadHEICFiles(5);
+    }
+
+    function preloadHEICFiles(limit) {
+        const indicator = document.getElementById('loading-indicator');
+        let foundHeics = 0;
+        
+        for (let i = 1; i < files.length; i++) {
+            if (foundHeics >= limit) break;
+            
+            let nextIdx = currentIndex + i;
+            if (nextIdx >= files.length) break;
+
+            const nextFile = files[nextIdx];
+            const name = nextFile.name.toLowerCase();
+
+            if (name.endsWith('.heic') || name.endsWith('.heif')) {
+                foundHeics++;
+                if (!imageCache.has(nextFile.name)) {
+                    indicator.style.opacity = 1;
+                    const img = new Image();
+                    img.src = `/file/${encodeURIComponent(nextFile.name)}`;
+                    img.onload = () => { };
+                    imageCache.set(nextFile.name, true);
+                }
+            }
+        }
+        setTimeout(() => { indicator.style.opacity = 0; }, 2000);
+    }
+
+    function handleSliderInput() {
+        const idx = document.getElementById('fileSlider').value;
+        if(files[idx]) {
+            document.getElementById('counter').innerText = `${parseInt(idx) + 1}/${files.length}`;
+            document.getElementById('date-overlay').innerText = files[idx].date_str;
+        }
+    }
+    
+    function handleSliderChange() {
+        currentIndex = parseInt(document.getElementById('fileSlider').value);
+        updateUI();
+    }
+
+    function flashMessage(text, color) {
+        const el = document.getElementById('status-msg');
+        el.innerText = text;
+        el.style.color = color;
+        el.style.opacity = 1;
+        setTimeout(() => el.style.opacity = 0, 700);
+    }
+
+    function nextFile() {
+        if(currentIndex < files.length - 1) {
+            currentIndex++;
+            updateUI();
+        }
+    }
+
+    function prevFile() {
+        if(currentIndex > 0) {
+            currentIndex--;
+            updateUI();
+        }
+    }
+
+    async function deleteFile() {
+        if(files.length === 0) return;
+        const file = files[currentIndex];
+        await fetch('/delete', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({filename: file.name})
+        });
+        flashMessage("Moved to 'Deleted'", "#e74c3c");
+        files.splice(currentIndex, 1);
+        document.getElementById('fileSlider').max = Math.max(0, files.length - 1);
+        if(currentIndex >= files.length) currentIndex = Math.max(0, files.length - 1);
+        updateUI();
+    }
+    
+    async function favFile() {
+        if(files.length === 0) return;
+        const file = files[currentIndex];
+        await fetch('/favorite', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({filename: file.name})
+        });
+        flashMessage("Added to Favorites", "#f1c40f");
+        files.splice(currentIndex, 1);
+        document.getElementById('fileSlider').max = Math.max(0, files.length - 1);
+        updateUI();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowLeft" || e.key === "1") prevFile();
+        if(e.key === "ArrowRight" || e.key === "4") nextFile();
+        if(e.key === "Backspace" || e.key === "Delete" || e.key === "2") deleteFile();
+        if(e.key === "ArrowUp" || e.key === "3") favFile();
+    });
+</script>
+</body>
+</html>
