@@ -49,7 +49,7 @@ I routinely drag photos and videos off of my iPhone into a folder on an external
 
 I built SnapSort so I could just fly through my photos. You click **Next**, **Back**, **Delete**, or **Favorite**, and the app handles the rest.
 
-One thing I did differently: if you click **Delete**, it doesn't actually wipe the photo. It creates a **"Deleted"** folder right inside your current folder and moves the photo there. That way, when you're finished, you can just dump that whole folder into the trash — or if you realize you made a mistake, you can easily pull the photo back out.
+One thing I did differently: if you click **Delete**, it doesn't actually wipe the photo. It creates a **"Deleted"** folder right inside your current folder and moves the photo there. That way, when you're finished, you can just dump that whole folder into the trash, or if you realize you made a mistake, you can easily pull the photo back out.
 
 It’s all local, so there are zero privacy issues, and I made sure the setup takes under two minutes. It should be easy enough for my grandma to use. I hope this helps someone else as much as it helped me!
 
@@ -60,7 +60,8 @@ It’s all local, so there are zero privacy issues, and I made sure the setup ta
 - 🚀 **Zero-Lag:** Pre-loads heavy iPhone HEIC files so you never stare at a loading screen  
 - 🔒 **100% Private:** Your photos never leave your hard drive. No internet required  
 - 🍎 **Mac Native:** Includes a "Reveal in Finder" button to quickly locate files  
-- ⌨️ **Keyboard Friendly:** Use your mouse or fly through with number keys or arrow keys  
+- ⌨️ **Keyboard Friendly:** Use your mouse or fly through with number keys or arrow keys
+- 💾 **Creates Folders:** Auto creates a **Delete** or **Favorite** folder so you can decide what to do with those files once you finish sorting
 
 ---
 
