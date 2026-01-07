@@ -14,7 +14,7 @@ If you want to use the app, just follow these 3 steps. You do not need to look a
 
 Click this link to download the app to your computer:
 
-👉 **CLICK HERE TO DOWNLOAD SNAPSORT FOR MAC**
+👉 [**CLICK HERE TO DOWNLOAD SNAPSORT FOR MAC**](https://github.com/M-r-Burns/SnapSort/releases/download/v1.0/SnapSort.zip)
 
 ---
 
