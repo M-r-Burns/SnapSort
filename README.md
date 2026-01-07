@@ -4,13 +4,13 @@
 
 For non-computer people like my grandma, downloading will take 2 minutes and is super easy. Just follow the instructions below.
 
-If you want to use the app, just follow these 3 steps. You do not need to look at any other files on this page.
+If you want to use the app, just follow these steps. You do not need to look at any other files on this page.
 
 *Currently works for Mac and may or may not work for Windows. It has also not been extensively tested, but it worked for my use case.*
 
 ---
 
-### Step 1: Click the Link Below
+### Click the Link Below
 
 Click this link to download the app to your computer:
 
@@ -18,23 +18,26 @@ Click this link to download the app to your computer:
 
 ---
 
-### Step 2: Drag to Desktop
+### ⚠️ HOW TO OPEN IT (READ THIS!)
+Because I am an independent developer (and didn't pay Apple $100), your Mac will try to block the app to be safe. You just need to tell your Mac it's okay.
 
-1. Find the `SnapSort.zip` file in your **Downloads** folder  
-2. Double-click it — it will turn into an app icon  
-3. Drag that app to your **Desktop**
+**Try Method A first. If that doesn't work, use Method B.**
 
----
+#### Method A: The Right-Click Trick
+1.  **Right-Click** (or Control-Click) the app icon.
+2.  Click **Open** in the menu.
+3.  If a box appears with an **"Open"** button, click it! You are done.
 
-### Step 3: The "Right-Click" Trick (Very Important!)
+#### Method B: The Settings Fix (If Method A failed)
+If Method A didn't give you an "Open" button:
+1.  Click **Done** on the error box.
+2.  Click the **Apple Logo ** (top left corner) → **System Settings**.
+3.  Click **Privacy & Security** in the sidebar.
+4.  Scroll down until you see a message about "SnapSort".
+5.  Click the **"Open Anyway"** button.
+6.  Enter your computer password.
 
-⚠️ Your Mac might try to block the app because I didn't pay Apple $100.  
-To fix this, you only need to do this **ONCE**:
-
-- Do **NOT** normal-click the app  
-- **Right-click** (or Control-click) the app icon  
-- Click **Open** in the menu  
-- A warning box will appear — click **Open**
+**You only have to do this ONCE.** After that, you can open the app normally!
 
 ✅ Now the app is safe! You can open it normally from now on.
 
