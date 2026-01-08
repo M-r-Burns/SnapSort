@@ -1,6 +1,9 @@
 # SnapSort 📸
 
+[![Watch the video](https://github.com/user-attachments/assets/e60e1704-83e1-4eb8-bd37-c0709d2cf7b9)
+
 ## 🟢 DOWNLOAD INSTRUCTIONS (Start Here!)
+
 
 For non-computer people like my grandma, downloading will take 2 minutes and is super easy. Just follow the instructions below.
 
