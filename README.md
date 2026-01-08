@@ -8,8 +8,6 @@
 
 For non-computer people like my grandma, downloading will take 2 minutes and is super easy. Just follow the instructions below.
 
-If you want to use the app, just follow these steps. You do not need to look at any other files on this page.
-
 *Currently works for Mac and may or may not work for Windows. It has also not been extensively tested, but it worked for my use case.*
 
 ---
