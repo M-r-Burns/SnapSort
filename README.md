@@ -1,6 +1,7 @@
 # SnapSort 📸
 
-[![Watch the video](https://github.com/user-attachments/assets/e60e1704-83e1-4eb8-bd37-c0709d2cf7b9)](github.com)
+![example](https://github.com/user-attachments/assets/748aa966-be84-4b2c-b740-e63c105ac039)
+
 
 ## 🟢 DOWNLOAD INSTRUCTIONS (Start Here!)
 
